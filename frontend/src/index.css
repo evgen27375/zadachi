@@ -27,11 +27,15 @@
 
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  color-scheme: light;
 }
+
+/* Жёстко фиксируем светлую тему на всех устройствах.
+   "only light" отключает принудительное затемнение (Android WebView force-dark и т.п.). */
+:root { color-scheme: only light; }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body, #root { height: 100%; margin: 0; }
+html { background: var(--bg); color-scheme: only light; }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
@@ -40,6 +44,12 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overscroll-behavior-y: none;
+  forced-color-adjust: none;
+}
+
+/* Если система всё же сообщает о тёмной теме — принудительно оставляем светлые цвета. */
+@media (prefers-color-scheme: dark) {
+  html, body { background: var(--bg); color: var(--text); }
 }
 
 h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; }
