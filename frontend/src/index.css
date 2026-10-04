@@ -131,6 +131,9 @@ a { color: var(--indigo); text-decoration: none; }
 .stat .chip { position: absolute; top: 14px; right: 14px; }
 .stat.full { grid-column: 1 / -1; }
 
+.tappable { cursor: pointer; transition: transform 0.12s ease; }
+.tappable:active { transform: scale(0.97); }
+
 /* Чип-иконка */
 .chip {
   width: 34px; height: 34px; border-radius: 50%;

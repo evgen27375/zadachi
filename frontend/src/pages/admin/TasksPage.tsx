@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { fetchAllTasks, type TaskListParams } from '../../api/endpoints';
 import type { Task } from '../../types';
 import { TaskCard } from '../../components/TaskCard';
@@ -25,9 +25,24 @@ const SORTS: { value: Sort; label: string }[] = [
   { value: 'status', label: 'По статусу' },
 ];
 
+const FILTER_VALUES: Filter[] = ['all', 'not_started', 'in_progress', 'done', 'overdue'];
+
 export default function TasksPage() {
   const navigate = useNavigate();
-  const [filter, setFilter] = useState<Filter>('all');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const rawFilter = searchParams.get('filter') as Filter | null;
+  const filter: Filter = rawFilter && FILTER_VALUES.includes(rawFilter) ? rawFilter : 'all';
+  const setFilter = (f: Filter) => {
+    setSearchParams(
+      (prev) => {
+        prev.set('filter', f);
+        return prev;
+      },
+      { replace: true },
+    );
+  };
+
   const [sort, setSort] = useState<Sort>('created_at');
   const [tasks, setTasks] = useState<Task[] | null>(null);
   const [error, setError] = useState<string | null>(null);

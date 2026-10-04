@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fetchReport } from '../../api/endpoints';
 import type { Report } from '../../types';
 import { ErrorBanner, Loader, Screen, Segmented } from '../../components/common';
@@ -14,6 +15,7 @@ const RANGES: { value: Range; label: string }[] = [
 ];
 
 export default function ReportsPage() {
+  const navigate = useNavigate();
   const [range, setRange] = useState<Range>('current_week');
   const [report, setReport] = useState<Report | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -39,22 +41,22 @@ export default function ReportsPage() {
       {report && (
         <>
           <div className="stat-grid">
-            <div className="stat">
+            <div className="stat tappable" role="button" onClick={() => navigate('/tasks?filter=done')}>
               <div className="value">{report.totals.done}</div>
               <div className="label">Выполнено за период</div>
               <span className="chip chip-green"><IconArrowUp size={18} /></span>
             </div>
-            <div className="stat">
+            <div className="stat tappable" role="button" onClick={() => navigate('/tasks?filter=in_progress')}>
               <div className="value">{report.totals.in_progress}</div>
               <div className="label">В процессе сейчас</div>
               <span className="chip chip-indigo"><IconCircle size={18} /></span>
             </div>
-            <div className="stat">
+            <div className="stat tappable" role="button" onClick={() => navigate('/tasks?filter=not_started')}>
               <div className="value">{report.totals.not_started}</div>
               <div className="label">Не начато сейчас</div>
               <span className="chip chip-grey"><IconList size={18} /></span>
             </div>
-            <div className="stat">
+            <div className="stat tappable" role="button" onClick={() => navigate('/tasks?filter=overdue')}>
               <div className="value" style={{ color: report.totals.overdue ? 'var(--red)' : undefined }}>
                 {report.totals.overdue}
               </div>

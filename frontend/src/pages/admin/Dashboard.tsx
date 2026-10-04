@@ -51,29 +51,29 @@ export default function Dashboard() {
       />
 
       <div className="stack">
-        <div className="hero" onClick={() => navigate('/tasks')} role="button">
+        <div className="hero tappable" onClick={() => navigate('/tasks?filter=all')} role="button">
           <div className="value">{stats.active}</div>
           <div className="label">Активных задач</div>
           <div className="hero-chip"><IconChart size={22} /></div>
         </div>
 
         <div className="stat-grid">
-          <div className="stat">
+          <div className="stat tappable" role="button" onClick={() => navigate('/tasks?filter=not_started')}>
             <div className="value">{stats.not_started}</div>
             <div className="label">Не начато</div>
             <span className="chip chip-grey"><IconList size={18} /></span>
           </div>
-          <div className="stat">
+          <div className="stat tappable" role="button" onClick={() => navigate('/tasks?filter=in_progress')}>
             <div className="value">{stats.in_progress}</div>
             <div className="label">В процессе</div>
             <span className="chip chip-indigo"><IconCircle size={18} /></span>
           </div>
-          <div className="stat">
+          <div className="stat tappable" role="button" onClick={() => navigate('/tasks?filter=done')}>
             <div className="value">{stats.done}</div>
             <div className="label">Выполнено</div>
             <span className="chip chip-green"><IconCheck size={18} /></span>
           </div>
-          <div className="stat">
+          <div className="stat tappable" role="button" onClick={() => navigate('/tasks?filter=overdue')}>
             <div className="value" style={{ color: stats.overdue ? 'var(--red)' : undefined }}>
               {stats.overdue}
             </div>
