@@ -54,7 +54,7 @@ export default function PeoplePage() {
                     {u.role === 'ADMIN' && <span className="badge badge-in_progress">админ</span>}
                   </div>
                   <div className="faint small" style={{ marginTop: 2 }}>
-                    {u.username ? `@${u.username} · ` : ''}ID: {u.id}
+                    ID: {u.id}
                   </div>
                   <div className="metrics">
                     <div className="m">

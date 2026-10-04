@@ -112,10 +112,10 @@ a { color: var(--indigo); text-decoration: none; }
 .hero::after {
   content: '';
   position: absolute;
-  right: -30px; top: -40px;
-  width: 170px; height: 170px;
+  right: -26px; top: -46px;
+  width: 192px; height: 192px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.28), rgba(255,255,255,0) 70%);
+  background: radial-gradient(circle at 34% 34%, rgba(255,255,255,0.34), rgba(255,255,255,0.06) 54%, rgba(255,255,255,0) 72%);
 }
 .hero .value { font-size: 44px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
 .hero .label { margin-top: 8px; font-size: 15px; opacity: 0.92; }
@@ -268,22 +268,26 @@ a { color: var(--indigo); text-decoration: none; }
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
   margin: 0 auto; max-width: 560px;
   display: flex; justify-content: space-around;
-  padding: 12px 8px calc(var(--safe-bottom) + 12px);
+  padding: 10px 8px calc(var(--safe-bottom) + 10px);
   background: #fff;
-  border-top: 1px solid #edeff5;
-  box-shadow: 0 -6px 24px rgba(40, 40, 80, 0.06);
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -6px 26px rgba(40, 40, 80, 0.08);
 }
 .nav-item {
   flex: 1; background: none; border: none;
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-  padding: 6px 0; color: #bcc0d2;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 2px 0; color: #bcc0d2;
   font-size: 11px; font-weight: 600;
   transition: color 0.2s ease, transform 0.15s ease;
 }
-.nav-item svg { transition: transform 0.2s ease; }
+.nav-ico {
+  display: flex; align-items: center; justify-content: center;
+  width: 52px; height: 32px; border-radius: 12px;
+  transition: background 0.2s ease;
+}
 .nav-item.active { color: var(--indigo); }
-.nav-item.active svg { transform: translateY(-1px) scale(1.06); }
-.nav-item:active { transform: scale(0.9); }
+.nav-item.active .nav-ico { background: var(--indigo-050); }
+.nav-item:active { transform: scale(0.92); }
 
 /* --- Комментарии --- */
 .comment { padding: 12px 14px; border-radius: var(--radius-sm); background: #f5f6fb; }

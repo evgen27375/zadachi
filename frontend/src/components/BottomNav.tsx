@@ -37,7 +37,7 @@ export function BottomNav({ role }: { role: Role }) {
             onClick={() => navigate(path)}
             type="button"
           >
-            <Icon size={23} />
+            <span className="nav-ico"><Icon size={22} /></span>
             {label}
           </button>
         );

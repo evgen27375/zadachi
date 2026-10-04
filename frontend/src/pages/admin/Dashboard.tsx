@@ -14,6 +14,7 @@ import {
   IconClock,
   IconList,
 } from '../../components/Icons';
+import { pluralTasks } from '../../utils/format';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ export default function Dashboard() {
       <div className="stack">
         <div className="hero tappable" onClick={() => navigate('/tasks?filter=all')} role="button">
           <div className="value">{stats.active}</div>
-          <div className="label">Активных задач</div>
+          <div className="label">{pluralTasks(stats.active)}</div>
           <div className="hero-chip"><IconChart size={22} /></div>
         </div>
 
