@@ -70,15 +70,27 @@ const server = app.listen(config.port, () => {
   console.log(`[server] backend слушает порт ${config.port} (${config.nodeEnv})`);
   console.log(`[server] администратор MAX ID: ${config.adminMaxUserId}`);
 
+  if (!config.botToken) {
+    console.warn('[server] MAX_BOT_TOKEN не задан — бот и уведомления отключены (сервер работает).');
+  }
+  if (!config.databaseUrl) {
+    console.warn('[server] DATABASE_URL не задан — запросы к БД будут завершаться ошибкой.');
+  }
+  if (!config.adminMaxUserId) {
+    console.warn('[server] ADMIN_MAX_USER_ID не задан — администратор не назначен.');
+  }
+
   // Проверим токен бота (не критично при недоступности сети).
-  getBotInfo()
-    .then((info) => console.log('[server] токен бота MAX валиден:', JSON.stringify(info).slice(0, 200)))
-    .catch((e) => console.warn('[server] не удалось проверить токен бота:', (e as Error).message));
+  if (config.botToken) {
+    getBotInfo()
+      .then((info) => console.log('[server] токен бота MAX валиден:', JSON.stringify(info).slice(0, 200)))
+      .catch((e) => console.warn('[server] не удалось проверить токен бота:', (e as Error).message));
+  }
 
   // Запуск получения апдейтов
-  if (config.botUpdatesMode === 'polling') {
+  if (config.botToken && config.botUpdatesMode === 'polling') {
     startPolling();
-  } else if (config.botUpdatesMode === 'webhook') {
+  } else if (config.botToken && config.botUpdatesMode === 'webhook') {
     if (config.webhookUrl) {
       subscribeWebhook(config.webhookUrl, config.webhookSecret)
         .then(() => console.log('[server] webhook подписка оформлена:', config.webhookUrl))

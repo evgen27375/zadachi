@@ -5,8 +5,24 @@ import { config } from '../config/env';
 // это нам и нужно, чтобы не терять точность MAX user ID. Явно фиксируем.
 types.setTypeParser(20, (val) => val);
 
+/**
+ * Управляемые PostgreSQL (Render, Railway, Neon, Supabase и т.п.) требуют TLS.
+ * Локальный Postgres (docker-compose host "db", localhost) — без TLS.
+ * Логику можно принудительно переопределить переменной PGSSL=true|false.
+ */
+function resolveSsl(): false | { rejectUnauthorized: boolean } {
+  const forced = (process.env.PGSSL || '').toLowerCase();
+  if (forced === 'true' || forced === '1') return { rejectUnauthorized: false };
+  if (forced === 'false' || forced === '0') return false;
+
+  const url = config.databaseUrl || '';
+  const isLocal = /@(db|localhost|127\.0\.0\.1)[:/]/.test(url) || url.includes('@db:');
+  return url && !isLocal ? { rejectUnauthorized: false } : false;
+}
+
 export const pool = new Pool({
-  connectionString: config.databaseUrl,
+  connectionString: config.databaseUrl || undefined,
+  ssl: resolveSsl(),
   max: 10,
   idleTimeoutMillis: 30_000,
   connectionTimeoutMillis: 10_000,

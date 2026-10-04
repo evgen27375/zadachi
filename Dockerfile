@@ -29,4 +29,6 @@ COPY --from=backend /be/dist ./dist
 COPY backend/src/db/migrations ./dist/db/migrations
 COPY --from=frontend /fe/dist ./dist/public
 EXPOSE 8080
-CMD ["sh","-c","node dist/db/migrate.js && node dist/index.js"]
+# migrate, затем старт. ';' (а не '&&'): даже если миграция временно не прошла,
+# сервер поднимется и будет отвечать (health/фронт), а не уйдёт в crash-loop.
+CMD ["sh","-c","node dist/db/migrate.js; node dist/index.js"]

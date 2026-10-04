@@ -7,14 +7,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 dotenv.config({ path: path.resolve(process.cwd(), '..', '.env') });
 
-function required(name: string): string {
-  const v = process.env[name];
-  if (!v || v.trim() === '') {
-    throw new Error(`Отсутствует обязательная переменная окружения: ${name}`);
-  }
-  return v.trim();
-}
-
 function optional(name: string, fallback = ''): string {
   const v = process.env[name];
   return v && v.trim() !== '' ? v.trim() : fallback;
@@ -25,25 +17,40 @@ function toInt(value: string, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
-const adminRaw = required('ADMIN_MAX_USER_ID');
-if (!/^\d+$/.test(adminRaw)) {
-  throw new Error('ADMIN_MAX_USER_ID должен быть числом (MAX user ID).');
+// Не роняем процесс при отсутствии переменных: сервер должен подняться и отдавать
+// фронтенд + /api/health даже с неполной конфигурацией (а не падать в crash-loop).
+// Отсутствующее логируем предупреждением, а функции, которым переменная нужна,
+// корректно деградируют.
+function warnIfEmpty(name: string): void {
+  if (!process.env[name] || process.env[name]!.trim() === '') {
+    console.warn(`[config] ВНИМАНИЕ: не задана переменная ${name} — часть функций будет отключена.`);
+  }
 }
+
+warnIfEmpty('DATABASE_URL');
+warnIfEmpty('MAX_BOT_TOKEN');
+warnIfEmpty('ADMIN_MAX_USER_ID');
+
+const adminRaw = optional('ADMIN_MAX_USER_ID');
+if (adminRaw && !/^\d+$/.test(adminRaw)) {
+  console.warn('[config] ADMIN_MAX_USER_ID должен быть числом (MAX user ID) — значение проигнорировано.');
+}
+const adminId = /^\d+$/.test(adminRaw) ? adminRaw : '';
 
 export const config = {
   nodeEnv: optional('NODE_ENV', 'development'),
   port: toInt(optional('PORT', '8080'), 8080),
 
-  databaseUrl: required('DATABASE_URL'),
+  databaseUrl: optional('DATABASE_URL'),
 
   // MAX
-  botToken: required('MAX_BOT_TOKEN'),
+  botToken: optional('MAX_BOT_TOKEN'),
   botApiBase: optional('MAX_BOT_API_BASE', 'https://botapi.max.ru').replace(/\/+$/, ''),
   botUsername: optional('MAX_BOT_USERNAME'),
   miniAppUrl: optional('MINI_APP_URL'),
 
   // Роли
-  adminMaxUserId: adminRaw, // храним как строку, сравниваем как строку (bigint-safe)
+  adminMaxUserId: adminId, // храним как строку, сравниваем как строку (bigint-safe)
 
   // Безопасность авторизации
   initDataMaxAgeSeconds: toInt(optional('INIT_DATA_MAX_AGE_SECONDS', '86400'), 86400),
