@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Task } from '../types';
 import { formatDateTime } from '../utils/format';
 import { PriorityBadge, StatusBadge } from './Badges';
+import { IconClock } from './Icons';
 
 export function TaskCard({ task, showAssignee }: { task: Task; showAssignee?: boolean }) {
   const navigate = useNavigate();
@@ -21,8 +22,8 @@ export function TaskCard({ task, showAssignee }: { task: Task; showAssignee?: bo
         {showAssignee && <span className="small muted">· {task.assignee_name}</span>}
       </div>
 
-      <div className="deadline" style={{ marginTop: 8 }}>
-        🕑 Срок: {formatDateTime(task.deadline)}
+      <div className="deadline">
+        <IconClock size={15} /> {formatDateTime(task.deadline)}
       </div>
     </div>
   );

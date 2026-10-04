@@ -1,10 +1,22 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fetchAllTasks, fetchStats } from '../../api/endpoints';
 import type { DashboardStats, Task } from '../../types';
 import { TaskCard } from '../../components/TaskCard';
 import { ErrorBanner, Loader, Screen } from '../../components/common';
+import { Header } from '../../components/Header';
+import {
+  IconBell,
+  IconChart,
+  IconCheck,
+  IconChevronRight,
+  IconCircle,
+  IconClock,
+  IconList,
+} from '../../components/Icons';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [tasks, setTasks] = useState<Task[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -21,55 +33,70 @@ export default function Dashboard() {
   if (error) return <Screen><ErrorBanner message={error} /></Screen>;
   if (!stats || !tasks) return <Loader text="Загрузка статистики…" />;
 
-  const groups: { key: string; title: string; items: Task[] }[] = [
-    { key: 'ns', title: 'Не начато', items: tasks.filter((t) => t.status === 'NOT_STARTED') },
-    { key: 'ip', title: 'В процессе', items: tasks.filter((t) => t.status === 'IN_PROGRESS') },
-    { key: 'dn', title: 'Выполнено', items: tasks.filter((t) => t.status === 'DONE') },
-  ];
+  const upcoming = [...tasks]
+    .filter((t) => t.status !== 'DONE')
+    .sort((a, b) => +new Date(a.deadline) - +new Date(b.deadline))
+    .slice(0, 3);
 
   return (
     <Screen>
-      <div className="screen-header">
-        <h1>Главная</h1>
-        <p className="subtitle">Сводка по задачам команды</p>
-      </div>
+      <Header
+        title="Главная"
+        subtitle="Сводка по задачам команды"
+        action={
+          <button className="icon-btn" aria-label="Уведомления">
+            <IconBell size={21} />
+          </button>
+        }
+      />
 
-      <div className="stat-grid">
-        <div className="card stat accent full">
+      <div className="stack">
+        <div className="hero" onClick={() => navigate('/tasks')} role="button">
           <div className="value">{stats.active}</div>
           <div className="label">Активных задач</div>
+          <div className="hero-chip"><IconChart size={22} /></div>
         </div>
-        <div className="card stat">
-          <div className="value">{stats.not_started}</div>
-          <div className="label">Не начато</div>
-        </div>
-        <div className="card stat">
-          <div className="value">{stats.in_progress}</div>
-          <div className="label">В процессе</div>
-        </div>
-        <div className="card stat">
-          <div className="value">{stats.done}</div>
-          <div className="label">Выполнено</div>
-        </div>
-        <div className="card stat danger">
-          <div className="value">{stats.overdue}</div>
-          <div className="label">Просрочено</div>
+
+        <div className="stat-grid">
+          <div className="stat">
+            <div className="value">{stats.not_started}</div>
+            <div className="label">Не начато</div>
+            <span className="chip chip-grey"><IconList size={18} /></span>
+          </div>
+          <div className="stat">
+            <div className="value">{stats.in_progress}</div>
+            <div className="label">В процессе</div>
+            <span className="chip chip-indigo"><IconCircle size={18} /></span>
+          </div>
+          <div className="stat">
+            <div className="value">{stats.done}</div>
+            <div className="label">Выполнено</div>
+            <span className="chip chip-green"><IconCheck size={18} /></span>
+          </div>
+          <div className="stat">
+            <div className="value" style={{ color: stats.overdue ? 'var(--red)' : undefined }}>
+              {stats.overdue}
+            </div>
+            <div className="label">Просрочено</div>
+            <span className="chip chip-red"><IconClock size={18} /></span>
+          </div>
         </div>
       </div>
 
-      {groups.map((g) =>
-        g.items.length > 0 ? (
-          <div key={g.key}>
-            <div className="section-title">
-              {g.title} · {g.items.length}
-            </div>
-            <div className="stack">
-              {g.items.slice(0, 5).map((t) => (
-                <TaskCard key={t.id} task={t} showAssignee />
-              ))}
-            </div>
-          </div>
-        ) : null,
+      <div className="section-title">
+        Ближайшие задачи
+        <span className="more" onClick={() => navigate('/tasks')}>
+          <IconChevronRight size={18} />
+        </span>
+      </div>
+      {upcoming.length === 0 ? (
+        <p className="small muted" style={{ padding: '0 2px' }}>Активных задач нет.</p>
+      ) : (
+        <div className="stack">
+          {upcoming.map((t) => (
+            <TaskCard key={t.id} task={t} showAssignee />
+          ))}
+        </div>
       )}
     </Screen>
   );

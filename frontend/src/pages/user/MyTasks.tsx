@@ -3,6 +3,7 @@ import { fetchMyTasks } from '../../api/endpoints';
 import type { Task } from '../../types';
 import { TaskCard } from '../../components/TaskCard';
 import { EmptyState, ErrorBanner, Loader, Screen } from '../../components/common';
+import { Header } from '../../components/Header';
 import { useAuth } from '../../context/AuthContext';
 
 export default function MyTasks() {
@@ -24,10 +25,7 @@ export default function MyTasks() {
 
   return (
     <Screen>
-      <div className="screen-header">
-        <h1>Мои задачи</h1>
-        <p className="subtitle">Здравствуйте, {me?.first_name}!</p>
-      </div>
+      <Header title="Мои задачи" subtitle={`Здравствуйте, ${me?.first_name ?? ''}!`} />
 
       {notStarted.length === 0 && inProgress.length === 0 && (
         <EmptyState emoji="🎉" title="Активных задач нет" hint="Новые задачи появятся здесь." />

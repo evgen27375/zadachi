@@ -3,6 +3,7 @@ import { fetchMyTasks } from '../../api/endpoints';
 import type { Task } from '../../types';
 import { TaskCard } from '../../components/TaskCard';
 import { EmptyState, ErrorBanner, Loader, Screen } from '../../components/common';
+import { Header } from '../../components/Header';
 
 export default function DonePage() {
   const [tasks, setTasks] = useState<Task[] | null>(null);
@@ -21,10 +22,7 @@ export default function DonePage() {
 
   return (
     <Screen>
-      <div className="screen-header">
-        <h1>Выполнено</h1>
-        <p className="subtitle">Завершённые задачи</p>
-      </div>
+      <Header title="Выполнено" subtitle="Завершённые задачи" />
 
       {done.length === 0 ? (
         <EmptyState emoji="✅" title="Пока ничего не выполнено" />

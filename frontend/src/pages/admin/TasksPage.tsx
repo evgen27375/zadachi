@@ -4,6 +4,8 @@ import { fetchAllTasks, type TaskListParams } from '../../api/endpoints';
 import type { Task } from '../../types';
 import { TaskCard } from '../../components/TaskCard';
 import { EmptyState, ErrorBanner, Loader, Screen, Segmented } from '../../components/common';
+import { Header } from '../../components/Header';
+import { IconPlus, IconSearch } from '../../components/Icons';
 
 type Filter = NonNullable<TaskListParams['filter']>;
 type Sort = NonNullable<TaskListParams['sort']>;
@@ -40,16 +42,22 @@ export default function TasksPage() {
 
   return (
     <Screen>
-      <div className="screen-header">
-        <h1>Задачи</h1>
-      </div>
+      <Header
+        title="Задачи"
+        subtitle="Все задачи команды"
+        action={
+          <button className="icon-btn" aria-label="Поиск">
+            <IconSearch size={21} />
+          </button>
+        }
+      />
 
       <div className="stack" style={{ gap: 10 }}>
         <Segmented options={FILTERS} value={filter} onChange={setFilter} />
         <Segmented options={SORTS} value={sort} onChange={setSort} />
       </div>
 
-      <div style={{ height: 14 }} />
+      <div style={{ height: 16 }} />
 
       {error && <ErrorBanner message={error} />}
       {!tasks && !error && <Loader text="Загрузка…" />}
@@ -62,8 +70,8 @@ export default function TasksPage() {
         </div>
       )}
 
-      <button className="btn btn-primary btn-lg fab" onClick={() => navigate('/new')}>
-        + Новая задача
+      <button className="fab" onClick={() => navigate('/new')} aria-label="Новая задача">
+        <IconPlus size={26} />
       </button>
     </Screen>
   );

@@ -35,7 +35,7 @@ export function Segmented<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="segmented glass">
+    <div className="segmented">
       {options.map((o) => (
         <button
           key={o.value}

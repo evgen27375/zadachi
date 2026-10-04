@@ -1,22 +1,24 @@
 import { useLocation, useNavigate } from 'react-router-dom';
+import type { ComponentType } from 'react';
 import type { Role } from '../types';
+import { IconChart, IconCheck, IconHome, IconList, IconUsers } from './Icons';
 
 interface NavDef {
   path: string;
   label: string;
-  icon: string;
+  Icon: ComponentType<{ size?: number }>;
 }
 
 const ADMIN_NAV: NavDef[] = [
-  { path: '/', label: 'Главная', icon: '🏠' },
-  { path: '/tasks', label: 'Задачи', icon: '🗂️' },
-  { path: '/people', label: 'Люди', icon: '👥' },
-  { path: '/reports', label: 'Отчёты', icon: '📊' },
+  { path: '/', label: 'Главная', Icon: IconHome },
+  { path: '/tasks', label: 'Задачи', Icon: IconList },
+  { path: '/people', label: 'Люди', Icon: IconUsers },
+  { path: '/reports', label: 'Отчёты', Icon: IconChart },
 ];
 
 const USER_NAV: NavDef[] = [
-  { path: '/', label: 'Мои задачи', icon: '🗂️' },
-  { path: '/done', label: 'Выполнено', icon: '✅' },
+  { path: '/', label: 'Мои задачи', Icon: IconList },
+  { path: '/done', label: 'Выполнено', Icon: IconCheck },
 ];
 
 export function BottomNav({ role }: { role: Role }) {
@@ -26,17 +28,17 @@ export function BottomNav({ role }: { role: Role }) {
 
   return (
     <nav className="bottom-nav">
-      {items.map((it) => {
-        const active = pathname === it.path;
+      {items.map(({ path, label, Icon }) => {
+        const active = pathname === path;
         return (
           <button
-            key={it.path}
+            key={path}
             className={`nav-item ${active ? 'active' : ''}`}
-            onClick={() => navigate(it.path)}
+            onClick={() => navigate(path)}
             type="button"
           >
-            <span className="icon">{it.icon}</span>
-            {it.label}
+            <Icon size={23} />
+            {label}
           </button>
         );
       })}
