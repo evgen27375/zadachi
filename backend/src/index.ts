@@ -68,16 +68,12 @@ app.use(errorHandler);
 
 const server = app.listen(config.port, () => {
   console.log(`[server] backend слушает порт ${config.port} (${config.nodeEnv})`);
-  console.log(`[server] администратор MAX ID: ${config.adminMaxUserId}`);
-
+  console.log('[server] администраторы (MAX ID):', config.adminMaxUserIds.join(', ') || '—');
   if (!config.botToken) {
-    console.warn('[server] MAX_BOT_TOKEN не задан — бот и уведомления отключены (сервер работает).');
+    console.warn('[server] MAX_BOT_TOKEN не задан — бот, уведомления и вход в Mini App отключены (сервер работает).');
   }
   if (!config.databaseUrl) {
     console.warn('[server] DATABASE_URL не задан — запросы к БД будут завершаться ошибкой.');
-  }
-  if (!config.adminMaxUserId) {
-    console.warn('[server] ADMIN_MAX_USER_ID не задан — администратор не назначен.');
   }
 
   // Проверим токен бота (не критично при недоступности сети).

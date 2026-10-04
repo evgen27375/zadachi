@@ -23,6 +23,15 @@ export async function notifyNewTask(task: Task): Promise<void> {
   await safeSend(task.assignee_id, text, `task_${task.id}`);
 }
 
+/** Уведомить всех администраторов (можно исключить одного по id). */
+export async function notifyAdmins(text: string, startParam?: string, exceptId?: string): Promise<void> {
+  await Promise.all(
+    config.adminMaxUserIds
+      .filter((id) => id && id !== exceptId)
+      .map((id) => safeSend(id, text, startParam)),
+  );
+}
+
 export async function notifyTaskDone(task: Task, assigneeName: string): Promise<void> {
   const when = task.completed_at
     ? formatDateTimeRu(task.completed_at, config.appTimezone)
@@ -32,7 +41,7 @@ export async function notifyTaskDone(task: Task, assigneeName: string): Promise<
     `${task.title}\n` +
     `Исполнитель: ${assigneeName}\n` +
     `Выполнено: ${when}`;
-  await safeSend(config.adminMaxUserId, text, `task_${task.id}`);
+  await notifyAdmins(text, `task_${task.id}`);
 }
 
 export async function notifyNewComment(
@@ -70,5 +79,5 @@ export async function sendWeeklyReport(report: Report): Promise<void> {
     }
   }
 
-  await safeSend(config.adminMaxUserId, text.trimEnd());
+  await notifyAdmins(text.trimEnd());
 }

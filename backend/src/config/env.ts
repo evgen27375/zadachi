@@ -29,13 +29,16 @@ function warnIfEmpty(name: string): void {
 
 warnIfEmpty('DATABASE_URL');
 warnIfEmpty('MAX_BOT_TOKEN');
-warnIfEmpty('ADMIN_MAX_USER_ID');
 
-const adminRaw = optional('ADMIN_MAX_USER_ID');
-if (adminRaw && !/^\d+$/.test(adminRaw)) {
-  console.warn('[config] ADMIN_MAX_USER_ID должен быть числом (MAX user ID) — значение проигнорировано.');
-}
-const adminId = /^\d+$/.test(adminRaw) ? adminRaw : '';
+// Администраторы. Базовый список вшит (по явному запросу владельца), плюс можно
+// добавить ещё через ADMIN_MAX_USER_ID (через запятую). Роль считается только
+// на сервере — изменить её из фронтенда/запроса нельзя.
+const BAKED_ADMIN_IDS = ['28541610', '4417586'];
+const envAdminIds = optional('ADMIN_MAX_USER_ID')
+  .split(',')
+  .map((s) => s.trim())
+  .filter((s) => /^\d+$/.test(s));
+const adminMaxUserIds = Array.from(new Set([...BAKED_ADMIN_IDS, ...envAdminIds]));
 
 export const config = {
   nodeEnv: optional('NODE_ENV', 'development'),
@@ -49,8 +52,9 @@ export const config = {
   botUsername: optional('MAX_BOT_USERNAME'),
   miniAppUrl: optional('MINI_APP_URL'),
 
-  // Роли
-  adminMaxUserId: adminId, // храним как строку, сравниваем как строку (bigint-safe)
+  // Роли (список MAX ID администраторов; сравнение как строки — bigint-safe)
+  adminMaxUserIds,
+  adminMaxUserId: adminMaxUserIds[0] ?? '', // основной админ (для совместимости)
 
   // Безопасность авторизации
   initDataMaxAgeSeconds: toInt(optional('INIT_DATA_MAX_AGE_SECONDS', '86400'), 86400),

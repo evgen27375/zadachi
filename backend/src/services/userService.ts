@@ -2,9 +2,9 @@ import { config } from '../config/env';
 import { query, queryOne } from '../db/pool';
 import type { MaxAuthUser, Role, User } from '../types';
 
-/** Роль определяется ТОЛЬКО на сервере по ADMIN_MAX_USER_ID. */
+/** Роль определяется ТОЛЬКО на сервере по списку администраторов. */
 export function resolveRole(maxUserId: string): Role {
-  return maxUserId === config.adminMaxUserId ? 'ADMIN' : 'USER';
+  return config.adminMaxUserIds.includes(maxUserId) ? 'ADMIN' : 'USER';
 }
 
 /**

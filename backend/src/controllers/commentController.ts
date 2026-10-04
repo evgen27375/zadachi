@@ -1,8 +1,7 @@
 import type { Request, Response } from 'express';
-import { config } from '../config/env';
 import * as taskService from '../services/taskService';
 import * as commentService from '../services/commentService';
-import { notifyNewComment } from '../bot/notifications';
+import { notifyAdmins, notifyNewComment } from '../bot/notifications';
 import { HttpError } from '../utils/httpError';
 import { addCommentSchema, idParamSchema } from '../utils/validation';
 
@@ -27,10 +26,16 @@ export async function addComment(req: Request, res: Response): Promise<void> {
 
   const comment = await commentService.addComment(id, user, text);
 
-  // Кому уведомление: если автор — админ, уведомляем исполнителя; иначе — админа.
-  const recipientId = user.role === 'ADMIN' ? task.assignee_id : config.adminMaxUserId;
-  if (recipientId && recipientId !== user.id) {
-    await notifyNewComment(recipientId, task, user.first_name, text);
+  // Кому уведомление: если автор — админ, уведомляем исполнителя;
+  // если автор — обычный пользователь, уведомляем всех администраторов.
+  if (user.role === 'ADMIN') {
+    if (task.assignee_id && task.assignee_id !== user.id) {
+      await notifyNewComment(task.assignee_id, task, user.first_name, text);
+    }
+  } else {
+    const preview = text.length > 300 ? text.slice(0, 300) + '…' : text;
+    const msg = `💬 Новый комментарий к задаче\n${task.title}\n\n${user.first_name}: ${preview}`;
+    await notifyAdmins(msg, `task_${task.id}`, user.id);
   }
 
   res.status(201).json(comment);
