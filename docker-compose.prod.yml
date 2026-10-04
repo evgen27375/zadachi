@@ -1,0 +1,28 @@
+# Продакшен-оверлей с автоматическим HTTPS (Caddy + Let's Encrypt).
+# Запуск на VPS с доменом, указывающим на этот сервер:
+#   DOMAIN=ваш-домен docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# (DOMAIN и ACME_EMAIL удобно задать в .env)
+services:
+  frontend:
+    # внутри прод-сети наружу напрямую не публикуем — трафик идёт через caddy
+    ports: []
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - frontend
+    environment:
+      DOMAIN: ${DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:-admin@example.com}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

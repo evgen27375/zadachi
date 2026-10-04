@@ -1,0 +1,43 @@
+# Render Blueprint — деплой в один клик (backend+фронт в одном сервисе + PostgreSQL).
+# Render.com -> New -> Blueprint -> выберите этот репозиторий.
+# Затем задайте секреты MAX_BOT_TOKEN и ADMIN_MAX_USER_ID в дашборде.
+databases:
+  - name: max-tasks-db
+    plan: free
+    databaseName: taskdb
+    user: taskuser
+
+services:
+  - type: web
+    name: max-tasks
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+            name: max-tasks-db
+            property: connectionString
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "8080"
+      - key: MAX_BOT_API_BASE
+        value: https://botapi.max.ru
+      - key: MAX_BOT_USERNAME
+        value: id710305301921_1_bot
+      - key: APP_TIMEZONE
+        value: Europe/Moscow
+      - key: BOT_UPDATES_MODE
+        value: polling
+      - key: INIT_DATA_MAX_AGE_SECONDS
+        value: "86400"
+      # Секреты — задать вручную в дашборде Render (sync:false не выгружает их в git):
+      - key: MAX_BOT_TOKEN
+        sync: false
+      - key: ADMIN_MAX_USER_ID
+        sync: false
+      - key: MINI_APP_URL
+        sync: false

@@ -1,0 +1,9 @@
+{
+	email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	# Автоматический TLS-сертификат Let's Encrypt для вашего домена.
+	# Весь трафик идёт на frontend (nginx), который отдаёт SPA и проксирует /api на backend.
+	reverse_proxy frontend:80
+}

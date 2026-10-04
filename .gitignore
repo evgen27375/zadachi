@@ -1,0 +1,33 @@
+# Secrets — NEVER commit
+.env
+.env.*
+*.env
+!.env.example
+!env.example
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+build/
+**/dist/
+**/build/
+
+# Logs
+*.log
+npm-debug.log*
+logs/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Docker volumes (local)
+pgdata/
+
+# Tooling noise
+.claude-flow/
