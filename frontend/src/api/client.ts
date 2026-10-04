@@ -1,4 +1,5 @@
 import { getInitData } from '../max/bridge';
+import { demoResponse, isDemo } from './demo';
 
 const API_BASE = (import.meta.env.VITE_API_BASE as string | undefined) || '/api';
 
@@ -13,6 +14,7 @@ export class ApiError extends Error {
 }
 
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+  if (isDemo) return demoResponse<T>(method, path);
   const initData = getInitData();
   const headers: Record<string, string> = {};
   if (body !== undefined) headers['Content-Type'] = 'application/json';

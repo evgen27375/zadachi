@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { fetchMe } from '../api/endpoints';
+import { isDemo } from '../api/demo';
 import { getInitData, getUnsafeUser } from '../max/bridge';
 import type { Me } from '../types';
 
@@ -28,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     setError(null);
 
-    if (!getInitData()) {
+    if (!isDemo && !getInitData()) {
       setError(
         'Не удалось получить данные авторизации MAX. Откройте приложение внутри мессенджера MAX.',
       );

@@ -167,6 +167,7 @@ a { color: var(--indigo); text-decoration: none; }
 }
 .segmented::-webkit-scrollbar { display: none; }
 .segmented button {
+  flex: 0 0 auto;
   border: none; background: transparent;
   padding: 9px 16px; border-radius: var(--radius-pill);
   font-size: 13.5px; font-weight: 600; color: var(--text-muted);
@@ -267,18 +268,22 @@ a { color: var(--indigo); text-decoration: none; }
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
   margin: 0 auto; max-width: 560px;
   display: flex; justify-content: space-around;
-  padding: 10px 10px calc(var(--safe-bottom) + 10px);
+  padding: 12px 8px calc(var(--safe-bottom) + 12px);
   background: #fff;
-  border-top: 1px solid #eceef5;
-  box-shadow: 0 -4px 20px rgba(40, 40, 80, 0.05);
+  border-top: 1px solid #edeff5;
+  box-shadow: 0 -6px 24px rgba(40, 40, 80, 0.06);
 }
 .nav-item {
   flex: 1; background: none; border: none;
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-  padding: 4px 0; color: var(--text-faint);
-  font-size: 11px; font-weight: 600; transition: color 0.15s ease;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 6px 0; color: #bcc0d2;
+  font-size: 11px; font-weight: 600;
+  transition: color 0.2s ease, transform 0.15s ease;
 }
+.nav-item svg { transition: transform 0.2s ease; }
 .nav-item.active { color: var(--indigo); }
+.nav-item.active svg { transform: translateY(-1px) scale(1.06); }
+.nav-item:active { transform: scale(0.9); }
 
 /* --- Комментарии --- */
 .comment { padding: 12px 14px; border-radius: var(--radius-sm); background: #f5f6fb; }
@@ -301,3 +306,56 @@ a { color: var(--indigo); text-decoration: none; }
 .empty .emoji { font-size: 34px; }
 .error-banner { background: var(--red-bg); color: var(--red); border-radius: var(--radius-sm); padding: 11px 13px; font-size: 14px; }
 .back-btn { background: none; border: none; color: var(--indigo); font-size: 15px; font-weight: 600; padding: 0; margin-bottom: 14px; display: inline-flex; align-items: center; gap: 2px; }
+
+/* ===== Плавные переходы между экранами =====
+   Анимируем только прозрачность: transform на .screen сделал бы её containing
+   block для position:fixed и сломал бы FAB/нижнее меню. */
+.screen { animation: screenIn 0.3s ease both; }
+@keyframes screenIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.screen > * { animation: riseIn 0.34s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .screen, .screen > * { animation: none; }
+}
+
+/* ===== Liquid glass: отклик при нажатии ===== */
+.btn, .icon-btn, .segmented button, .tappable, .task-card, .hero, .nav-item {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+/* FAB остаётся position: fixed — только клиппинг для блика */
+.fab { overflow: hidden; isolation: isolate; }
+.btn::after, .fab::after, .icon-btn::after, .segmented button::after,
+.tappable::after, .task-card::after, .hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 60%);
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+  pointer-events: none;
+}
+/* индиго-блик для светлых карточек, чтобы отклик был заметен */
+.tappable::after, .task-card::after {
+  background: radial-gradient(circle at center, rgba(79, 70, 229, 0.16), rgba(79, 70, 229, 0) 62%);
+}
+.btn:active::after, .fab:active::after, .icon-btn:active::after, .segmented button:active::after,
+.tappable:active::after, .task-card:active::after, .hero:active::before {
+  opacity: 1;
+  transform: scale(1.25);
+  transition: opacity 0s, transform 0s;
+}
+
+/* мягкое «вдавливание» для карточек-кнопок */
+.task-card { transition: transform 0.14s ease, box-shadow 0.2s ease; }
+.task-card:active { transform: scale(0.985); }
+.card.task-card:active { box-shadow: 0 3px 12px rgba(40, 40, 80, 0.08); }
